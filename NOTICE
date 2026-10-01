@@ -1,0 +1,9 @@
+The preset shape geometry table (src/presets.b64, and the _PRESET_B64 constant
+embedded at the end of pptx_to_html.py) is a compressed, reformatted copy of
+presetShapeDefinitions.xml from the LibreOffice project
+(oox/source/drawingml/customshapes/presetShapeDefinitions.xml), which
+reproduces the preset shape definitions of ECMA-376. That data is covered by
+the Mozilla Public License 2.0 (https://www.mozilla.org/MPL/2.0/).
+tools/build_presets.py regenerates it from the original XML.
+
+All other files are under the MIT License (see LICENSE).
