@@ -27,12 +27,18 @@ _CSS = """
 .{u}.dk .pg.on{{display:block}}
 .{u}.dk .sf{{margin-bottom:8px}}
 .{u}.dk .nt{{margin-top:0}}
-.{u}.dk .bar{{display:flex;align-items:center;justify-content:center;gap:10px;max-width:{maxw};margin:0 auto 8px;font:13px/1 system-ui,-apple-system,'Segoe UI',sans-serif;color:#666;user-select:none}}
-.{u} .bar button{{font:inherit;color:inherit;background:rgba(127,127,127,.14);border:1px solid rgba(127,127,127,.35);border-radius:6px;padding:6px 12px;cursor:pointer}}
-.{u} .bar button:hover{{background:rgba(127,127,127,.28)}}
-.{u} .bar button:disabled{{opacity:.35;cursor:default}}
-.{u} .bar .n{{min-width:5.5em;text-align:center;font-variant-numeric:tabular-nums}}
-@media (prefers-color-scheme:dark){{.{u} .bar{{color:#bbb}}}}
+.{u}.dk .bar{{display:flex;align-items:center;gap:2px;width:max-content;max-width:100%;margin:0 auto 10px;padding:3px;box-sizing:border-box;font:500 13px/1 Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;color:#4d4d4d;background:#fff;border:1px solid #e3e3e3;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);user-select:none;-webkit-user-select:none}}
+.{u} .bar button{{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:28px;min-width:28px;padding:0 8px;font:inherit;color:inherit;background:transparent;border:0;border-radius:8px;cursor:pointer;transition:background .15s ease,color .15s ease}}
+.{u} .bar button:hover{{background:#ececec;color:#171717}}
+.{u} .bar button:active{{background:#e3e3e3}}
+.{u} .bar button:focus-visible{{outline:2px solid rgba(120,120,120,.55);outline-offset:1px}}
+.{u} .bar button:disabled{{opacity:.3;cursor:default;background:transparent}}
+.{u} .bar svg{{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}}
+.{u} .bar .n{{min-width:4.2em;padding:0 4px;text-align:center;font-variant-numeric:tabular-nums;color:#676767;letter-spacing:.01em}}
+.{u} .bar .sp{{width:1px;height:16px;background:#e3e3e3;margin:0 4px}}
+@media (prefers-color-scheme:dark){{.{u}.dk .bar{{color:#cdcdcd;background:#262626;border-color:#333;box-shadow:0 1px 2px rgba(0,0,0,.3)}}
+.{u} .bar button:hover{{background:#333;color:#fff}}.{u} .bar button:active{{background:#3d3d3d}}
+.{u} .bar .n{{color:#9b9b9b}}.{u} .bar .sp{{background:#3d3d3d}}}}
 @media print{{.{u} .sf{{box-shadow:none;break-inside:avoid;margin-bottom:0}}}}
 """
 
@@ -181,13 +187,13 @@ def _deck_css(deck, max_width):
 
 
 _DECK_JS = """(function(){var r=document.currentScript.parentElement,p=r.querySelectorAll('.pg'),n=p.length,i=0,all=false;
-var b=r.querySelector('.bar'),prev=b.querySelector('.pv'),next=b.querySelector('.nx'),lab=b.querySelector('.n'),tg=b.querySelector('.al');
+var b=r.querySelector('.bar'),prev=b.querySelector('.pv'),next=b.querySelector('.nx'),lab=b.querySelector('.n'),tg=b.querySelector('.al .tx'),tb=b.querySelector('.al'),sp=b.querySelector('.sp');
 function h(){try{parent.postMessage({type:'iframe:height',height:document.documentElement.scrollHeight},'*')}catch(e){}}
 function show(k){i=Math.max(0,Math.min(n-1,k));for(var j=0;j<n;j++)p[j].classList.toggle('on',j===i);
 lab.textContent=(i+1)+' / '+n;prev.disabled=i===0;next.disabled=i===n-1;h()}
 function mode(a){all=a;r.classList.toggle('dk',!all);tg.textContent=all?'One at a time':'Show all';
-prev.style.display=next.style.display=lab.style.display=all?'none':'';h()}
-prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};tg.onclick=function(){mode(!all)};
+prev.style.display=next.style.display=lab.style.display=sp.style.display=all?'none':'';h()}
+prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};tb.onclick=function(){mode(!all)};
 document.addEventListener('keydown',function(e){if(all)return;if(e.key==='ArrowRight'||e.key==='PageDown'){show(i+1);e.preventDefault()}
 else if(e.key==='ArrowLeft'||e.key==='PageUp'){show(i-1);e.preventDefault()}else if(e.key==='Home')show(0);else if(e.key==='End')show(n-1)});
 mode(false);show(0);window.addEventListener('load',h);window.addEventListener('resize',h);
@@ -214,8 +220,11 @@ def convert(src, full_document=True, notes=True, title=None, max_width="1280px",
     bar = ""
     script = _HEIGHT_JS
     if viewer == "deck" and len(slides) > 1:
-        bar = ('<div class="bar"><button class="pv" type="button">&#8249; Previous</button><span class="n"></span>'
-               '<button class="nx" type="button">Next &#8250;</button><button class="al" type="button">Show all</button></div>')
+        ico = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="%s"/></svg>'
+        bar = ('<div class="bar"><button class="pv" type="button" title="Previous slide" aria-label="Previous slide">%s</button>'
+               '<span class="n"></span><button class="nx" type="button" title="Next slide" aria-label="Next slide">%s</button>'
+               '<span class="sp"></span><button class="al" type="button"><span class="tx">Show all</span></button></div>') % (
+                   ico % "M15 6l-6 6 6 6", ico % "M9 6l6 6-6 6")
         script = _DECK_JS
     frag = '<div class="%s"><style>%s</style>%s%s<script>%s</script></div>' % (
         deck.uid, _deck_css(deck, max_width), bar, body, script)
