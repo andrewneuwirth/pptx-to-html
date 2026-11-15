@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/images/icon.png" width="128" height="128" alt="pptx-to-html icon">
-
 # pptx-to-html
 
 **Convert PowerPoint (`.pptx`) files to a single self-contained HTML file.**
